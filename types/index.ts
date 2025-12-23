@@ -1,13 +1,14 @@
 // Shared TypeScript types for ApplyAI
 
-export interface Resume {
-  id: string;
-}
-
-export interface QAEntry {
-  id: string;
-}
-
-export interface JobApplication {
-  id: string;
-}
+export type {
+  Resume,
+  NewResume,
+  QAEntry,
+  NewQAEntry,
+  JobApplication,
+  NewJobApplication,
+  GeneratedOutput,
+  NewGeneratedOutput,
+  ExperienceEntry,
+  EducationEntry,
+} from '@/lib/db/schema';
