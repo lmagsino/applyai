@@ -175,4 +175,3 @@ MIT © [Leodegario Magsino Jr.]
 *Because job hunting shouldn't feel like a full-time job*
 
 </div>
-EOF
