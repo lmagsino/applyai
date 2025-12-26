@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { resumes } from '@/lib/db/schema';
-import { parseResume } from '@/lib/services/resumeParser';
-import { desc } from 'drizzle-orm';
+import { createResumeFromPDF, getAllResumes } from '@/lib/services/resume';
 
 // POST - Upload and parse a resume
 export async function POST(request: NextRequest) {
@@ -29,24 +26,13 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const base64 = Buffer.from(bytes).toString('base64');
 
-    // Parse with Claude
-    const parsed = await parseResume(base64);
-
-    // Save to database
-    const [savedResume] = await db.insert(resumes).values({
-      fullText: parsed.fullText,
-      name: parsed.name,
-      email: parsed.email,
-      phone: parsed.phone,
-      skills: parsed.skills,
-      experience: parsed.experience,
-      education: parsed.education,
-    }).returning();
+    // Use service to parse and save
+    const resume = await createResumeFromPDF(base64);
 
     return NextResponse.json({
       message: 'Resume parsed and saved successfully',
-      resume: savedResume,
-    });
+      resume,
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Resume upload error:', error);
@@ -60,11 +46,7 @@ export async function POST(request: NextRequest) {
 // GET - List all resumes
 export async function GET() {
   try {
-    const allResumes = await db
-      .select()
-      .from(resumes)
-      .orderBy(desc(resumes.createdAt));
-
+    const allResumes = await getAllResumes();
     return NextResponse.json({ resumes: allResumes });
   } catch (error) {
     console.error('Failed to fetch resumes:', error);
